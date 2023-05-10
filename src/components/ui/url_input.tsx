@@ -15,12 +15,18 @@ export default function UrlInput() {
   const [res, setRes] = useState<Finished | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async () => {
-    setLoading(true);
-    const data: any = await fetchChat(text);
-    const finished: Finished = JSON.parse(data);
-    setRes(finished);
-    setLoading(false);
+  const handleAction = async () => {
+    try {
+      console.log("submitted");
+      const data: any = await fetchChat(text);
+      const finished: Finished = JSON.parse(data);
+      setRes(finished);
+      setLoading(false);
+    } catch (error) {
+      alert(error);
+      setLoading(false);
+      return
+    }
   };
 
   return (
@@ -42,7 +48,7 @@ export default function UrlInput() {
       )}
 
       {!loading && (
-        <form action={handleSubmit}>
+        <form action={() => handleAction()} onSubmit={() => setLoading(true)}>
           <label
             htmlFor="search"
             className="hidden text-sm font-medium leading-6 text-gray-900"
@@ -62,10 +68,7 @@ export default function UrlInput() {
             />
             <div className="absolute inset-y-0 right-0 flex py-1.5 pr-1.5">
               <input type="submit" className="invisible" />
-              <kbd
-                className="inline-flex hover:cursor-pointer items-center rounded border border-gray-200 px-1 font-sans text-xs text-gray-400"
-                onClick={() => setLoading(!loading)}
-              >
+              <kbd className="inline-flex hover:cursor-pointer items-center rounded border border-gray-200 px-1 font-sans text-xs text-gray-400">
                 ENTER
               </kbd>
             </div>
