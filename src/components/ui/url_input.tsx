@@ -4,6 +4,10 @@ import { fetchChat } from "@/lib/query";
 import List from "./list";
 import Confetti from "react-confetti";
 import { MutatingDots } from "react-loader-spinner";
+import getTranscript from "@/lib/get_transcript";
+import { generateParams, messageContext } from "@/lib/prompt";
+import { ChatCompletionRequestMessage } from "openai";
+import { PromptParamType } from "@/lib/types";
 
 type Finished = {
   ingredients: string[];
@@ -17,15 +21,38 @@ export default function UrlInput() {
 
   const handleAction = async () => {
     try {
-      console.log("submitted");
-      const data: any = await fetchChat(text);
-      const finished: Finished = JSON.parse(data);
-      setRes(finished);
-      setLoading(false);
+      const processedTranscript = await getTranscript(text);
+      if (processedTranscript.error !== undefined) {
+        throw new Error(processedTranscript.error);
+      }
+      if (processedTranscript.transcript === undefined) {
+        throw new Error("Problem processing youtube transcript");
+      }
+      const inputMessages: ChatCompletionRequestMessage[] =
+        processedTranscript?.transcript?.map((item) => ({
+          role: "user",
+          content: item.concat(messageContext),
+        }));
+      const params: PromptParamType[] = inputMessages.map((item) => ({
+        model: "gpt-3.5-turbo",
+        messages: [item],
+        temperature: 0,
+      }));
+
+      const { data, error } = await fetchChat(params[0]);
+      if (error) {
+        throw new Error(`${error}`);
+      }
+      if (data) {
+        const finished: Finished = JSON.parse(data.content);
+
+        setRes(finished);
+        setLoading(false);
+      }
     } catch (error) {
       alert(error);
       setLoading(false);
-      return
+      return;
     }
   };
 
