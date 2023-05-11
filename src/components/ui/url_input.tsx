@@ -22,12 +22,15 @@ export default function UrlInput() {
   const handleAction = async () => {
     try {
       const processedTranscript = await getTranscript(text);
+      console.log("do we get here?");
       if (processedTranscript.error !== undefined) {
+        console.log("tes");
         throw new Error(processedTranscript.error);
       }
       if (processedTranscript.transcript === undefined) {
         throw new Error("Problem processing youtube transcript");
       }
+      
       const inputMessages: ChatCompletionRequestMessage[] =
         processedTranscript?.transcript?.map((item) => ({
           role: "user",
@@ -44,6 +47,7 @@ export default function UrlInput() {
         throw new Error(`${error}`);
       }
       if (data) {
+        console.log(data);
         const finished: Finished = JSON.parse(data.content);
 
         setRes(finished);
@@ -95,13 +99,22 @@ export default function UrlInput() {
             />
             <div className="absolute inset-y-0 right-0 flex py-1.5 pr-1.5">
               <input type="submit" className="invisible" />
-              <kbd className="inline-flex hover:cursor-pointer items-center rounded border border-gray-200 px-1 font-sans text-xs text-gray-400">
+              <kbd
+                className="inline-flex hover:cursor-pointer items-center rounded border border-gray-200 px-1 font-sans text-xs text-gray-400"
+                onClick={() => console.log(res)}
+              >
                 ENTER
               </kbd>
             </div>
           </div>
         </form>
       )}
+    </div>
+  );
+}
+
+/*
+
       {res && (
         <div className="p-5 rounded-xl mt-12 shadow-xl">
           <Confetti />
@@ -114,6 +127,5 @@ export default function UrlInput() {
           </div>
         </div>
       )}
-    </div>
-  );
-}
+
+      */

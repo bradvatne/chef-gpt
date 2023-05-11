@@ -1,3 +1,4 @@
+'use server'
 import openai from "@/lib/openai";
 import { ChatCompletionResponseMessage } from "openai";
 import { PromptParamType } from "./types";
@@ -10,7 +11,9 @@ type FetchResponseType = {
 export async function fetchChat(
   params: PromptParamType
 ): Promise<FetchResponseType> {
+  'use server'
   try {
+    console.log(params, 'params')
     const completion = await openai.createChatCompletion(params);
     return {
       error: undefined,
