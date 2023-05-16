@@ -1,5 +1,7 @@
+"use server";
 import Nav from "./nav";
 import UrlInput from "./ui/url_input";
+import { getData } from "@/lib/query";
 
 const {
   heading,
@@ -15,7 +17,7 @@ const {
   },
 };
 
-export default function Hero() {
+export default async function Hero() {
   return (
     <div className="bg-white">
       <Nav />
@@ -49,7 +51,7 @@ export default function Hero() {
             </h1>
             <p className="mt-6 text-lg leading-8 text-gray-600">{subheading}</p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
-              <UrlInput />
+              <UrlInput getData={getData} />
             </div>
           </div>
         </div>

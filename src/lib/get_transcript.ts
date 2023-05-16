@@ -10,7 +10,7 @@ type ProcessedTranscript = {
 export default async function getTranscript(
   rawURL: string
 ): Promise<ProcessedTranscript> {
-  "use server";
+  'use server'
   const youtubeId = youtubeParser(rawURL);
   const arrayTranscript = await YoutubeTranscript.fetchTranscript(
     `${youtubeId}`

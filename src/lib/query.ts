@@ -1,28 +1,37 @@
-'use server'
+"use server";
 import openai from "@/lib/openai";
-import { ChatCompletionResponseMessage } from "openai";
-import { PromptParamType } from "./types";
+import {
+  ChatCompletionResponseMessage,
+  CreateCompletionRequest,
+  CreateCompletionResponse,
+} from "openai";
+import { generateMessage, generateParams } from "./prompt";
 
-type FetchResponseType = {
-  error: undefined | string;
-  data: undefined | ChatCompletionResponseMessage;
+export const callChatGPT = async (params: CreateCompletionRequest) => {
+  try {
+    const result = await openai.createCompletion(params);
+    return result;
+  } catch (error: any) {
+    console.log(error.response.data);
+  }
 };
 
-export async function fetchChat(
-  params: PromptParamType
-): Promise<FetchResponseType> {
-  'use server'
-  try {
-    console.log(params, 'params')
-    const completion = await openai.createChatCompletion(params);
-    return {
-      error: undefined,
-      data: completion.data.choices[0].message
-    };
-  } catch (e) {
-    return {
-      error: `${e}`,
-      data: undefined,
-    };
-  }
-}
+export const getData = async (
+  transcriptItem: string,
+  currentStep: number,
+  length: number,
+  prevInfo?: any
+) => {
+  const message = generateMessage(
+    currentStep,
+    length,
+    transcriptItem,
+    prevInfo && prevInfo
+  );
+
+  const params = generateParams(message);
+  console.log(params);
+  const completion = await callChatGPT(params);
+  console.log(completion);
+  return JSON.stringify(completion?.data.choices[0].text);
+};

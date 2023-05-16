@@ -1,58 +1,44 @@
 "use client";
 import { useState } from "react";
-import { fetchChat } from "@/lib/query";
-import List from "./list";
-import Confetti from "react-confetti";
+
 import { MutatingDots } from "react-loader-spinner";
 import getTranscript from "@/lib/get_transcript";
-import { generateParams, messageContext } from "@/lib/prompt";
-import { ChatCompletionRequestMessage } from "openai";
-import { PromptParamType } from "@/lib/types";
 
 type Finished = {
   ingredients: string[];
   instructions: string[];
 };
 
-export default function UrlInput() {
+export default function UrlInput({ getData }: { getData: Function }) {
   const [text, setText] = useState("");
-  const [res, setRes] = useState<Finished | null>(null);
+  const [recipe, setRecipe] = useState<Finished | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleAction = async () => {
     try {
       const processedTranscript = await getTranscript(text);
-      console.log("do we get here?");
+
       if (processedTranscript.error !== undefined) {
-        console.log("tes");
         throw new Error(processedTranscript.error);
       }
       if (processedTranscript.transcript === undefined) {
         throw new Error("Problem processing youtube transcript");
       }
-      
-      const inputMessages: ChatCompletionRequestMessage[] =
-        processedTranscript?.transcript?.map((item) => ({
-          role: "user",
-          content: item.concat(messageContext),
-        }));
-      const params: PromptParamType[] = inputMessages.map((item) => ({
-        model: "gpt-3.5-turbo",
-        messages: [item],
-        temperature: 0,
-      }));
 
-      const { data, error } = await fetchChat(params[0]);
-      if (error) {
-        throw new Error(`${error}`);
-      }
-      if (data) {
-        console.log(data);
-        const finished: Finished = JSON.parse(data.content);
+      const { transcript } = processedTranscript;
 
-        setRes(finished);
-        setLoading(false);
+      for (let i = 0; i < transcript.length; i++) {
+        console.log("pass #: ", i);
+        const completion = await getData(transcript[i], i, length, recipe);
+        if (completion) {
+          const updatedRecipe = await JSON.parse(completion);
+          setRecipe(updatedRecipe);
+          console.log("success! set recipe to", completion);
+        }
       }
+  
+
+      setLoading(false);
     } catch (error) {
       alert(error);
       setLoading(false);
@@ -101,7 +87,7 @@ export default function UrlInput() {
               <input type="submit" className="invisible" />
               <kbd
                 className="inline-flex hover:cursor-pointer items-center rounded border border-gray-200 px-1 font-sans text-xs text-gray-400"
-                onClick={() => console.log(res)}
+                onClick={() => console.log(recipe)}
               >
                 ENTER
               </kbd>
