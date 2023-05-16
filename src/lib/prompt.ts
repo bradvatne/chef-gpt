@@ -26,9 +26,9 @@ export const generateMessage = (
   return `
   Your job is to identify and list ingredients and instructions from a video transcript and list them.
   This is part ${currentStep} of ${totalSteps} total transcript items.    
-  So far your information has been:
-  ${prevResponse ? prevResponse : "{'ingredients: [], 'instructions': []}"}
+  our info so far is {"ingredients": [], "instructions": []}
+  ${prevResponse}
   The current transcript segment for you to anlyze is ${transcriptSegment}
-  Reply to this message only with the json object provided updated.
+  Reply to this message with the updated json format.
   `;
 };

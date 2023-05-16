@@ -32,11 +32,12 @@ export default function UrlInput({ getData }: { getData: Function }) {
         const completion = await getData(transcript[i], i, length, recipe);
         if (completion) {
           const updatedRecipe = await JSON.parse(completion);
+          console.log(completion.ingredients);
+          console.log(completion.instructions);
           setRecipe(updatedRecipe);
           console.log("success! set recipe to", completion);
         }
       }
-  
 
       setLoading(false);
     } catch (error) {
